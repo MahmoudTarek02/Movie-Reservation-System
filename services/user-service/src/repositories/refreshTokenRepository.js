@@ -29,8 +29,11 @@ const revokeById = (id, { ip, reason, replacedByTokenHash } = {}) => RefreshToke
   { new: true }
 );
 
+// object destructuring + default value
+// findOneAndUpdate takes a filter, an update object, and options. 
 const revokeByHash = (tokenHash, { ip, reason } = {}) => RefreshToken.findOneAndUpdate(
-  { tokenHash, revokedAt: { $exists: false } },
+  // tokenHash must match and token must not be already revoked (revokedAt must not exist)
+  { tokenHash, revokedAt: { $exists: false } }, 
   {
     $set: {
       revokedAt: new Date(),

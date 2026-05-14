@@ -97,7 +97,7 @@ const updatePassword = (userId, passwordHash) => User.findByIdAndUpdate(
 const markVerified = (userId) => User.findByIdAndUpdate(
   userId,
   { $set: { isVerified: true } },
-  { new: true }
+  { new: true } // return the updated document after update is applied
 );
 
 const softDelete = (userId) => User.findByIdAndUpdate(

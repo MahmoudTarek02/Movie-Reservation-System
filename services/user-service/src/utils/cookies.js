@@ -9,7 +9,7 @@ const getRefreshTokenCookieOptions = () => ({
 const setRefreshTokenCookie = (res, token) => {
   res.cookie(process.env.REFRESH_TOKEN_COOKIE_NAME || 'refreshToken', token, getRefreshTokenCookieOptions());
 };
-
+ 
 const clearRefreshTokenCookie = (res) => {
   res.clearCookie(process.env.REFRESH_TOKEN_COOKIE_NAME || 'refreshToken', {
     httpOnly: true,

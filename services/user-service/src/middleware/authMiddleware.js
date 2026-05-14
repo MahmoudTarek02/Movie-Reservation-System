@@ -12,6 +12,7 @@ const getBearerToken = (req) => {
 };
 
 const protect = catchAsync(async (req, res, next) => {
+  // console.log('PROTECT HIT:', req.method, req.originalUrl);
   const token = getBearerToken(req);
 
   if (!token) {

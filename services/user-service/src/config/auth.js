@@ -17,6 +17,9 @@ module.exports = {
     lockTimeMinutes: parsePositiveInt(process.env.ACCOUNT_LOCK_MINUTES, 15),
     passwordResetTokenMinutes: parsePositiveInt(process.env.PASSWORD_RESET_TOKEN_MINUTES, 10),
     emailVerificationTokenMinutes: parsePositiveInt(process.env.EMAIL_VERIFICATION_TOKEN_MINUTES, 60) 
+    // if process.env.EMAIL_VERIFICATION_TOKEN_MINUTES is not set, default to 60 minutes (1 hour) 
+    // since email verification might not be as time-sensitive as password reset, 
+    // and giving users more time to verify their email can lead to better user experience and higher verification rates.
   },
   oauth: {
     google: {

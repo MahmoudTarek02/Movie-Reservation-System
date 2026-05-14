@@ -85,10 +85,14 @@ const createEmailVerificationToken = async (user) => {
 const sendVerificationEmail = async (user, rawToken) => {
   const verificationUrl = `${authConfig.app.serviceUrl}/api/v1/users/verify-email/${rawToken}`;
 
+  const expiresInMinutes =  authConfig.security.emailVerificationTokenMinutes;
+
   await sendEmail({
     email: user.email,
     subject: 'Verify your email',
-    message: `Verify your email by opening this link: ${verificationUrl}`
+    message: `Verify your email by opening this link: ${verificationUrl}
+    This verification link will expire in ${expiresInMinutes} minutes.
+    If you did not create an account, you can ignore this email.`
   });
 };
 
@@ -160,7 +164,7 @@ const login = async ({ email, password }, context = {}) => {
     throw new AppError('Email and password are required', 400);
   }
 
-  const user = await userRepository.findActiveByEmail(email, true);
+  const user = await userRepository.findActiveByEmail(email, true); 
 
   if (!user || !user.passwordHash) {
     await recordFailedLogin({ email, reason: 'invalid_credentials', context });
@@ -290,6 +294,7 @@ const refreshAccessToken = async (refreshToken, context = {}) => {
   };
 };
 
+
 const logout = async (refreshToken, context = {}) => {
   if (!refreshToken) return;
 
@@ -414,7 +419,7 @@ const verifyEmail = async (token, context = {}) => {
     throw new AppError('Email verification token is invalid or expired', 400);
   }
 
-  const user = await userRepository.markVerified(verificationToken.user);
+  const user = await userRepository.markVerified(verificationToken.user); // user's primary key/id
   await emailVerificationTokenRepository.markUsed(verificationToken._id);
 
   await writeAuditLog({

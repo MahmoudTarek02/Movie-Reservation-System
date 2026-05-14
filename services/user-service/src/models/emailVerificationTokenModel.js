@@ -17,7 +17,7 @@ const emailVerificationTokenSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      index: true
+      // index: true // not needed since we are using expireAfterSeconds option in the index definition below
     },
     usedAt: Date
   },

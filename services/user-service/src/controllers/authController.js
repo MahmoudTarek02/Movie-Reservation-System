@@ -10,6 +10,8 @@ const getRequestContext = (req) => ({
   deviceId: req.get('x-device-id') 
 });
 
+// get refresh token from cookies 
+// or from request body (for clients that can't use cookies, e.g. mobile apps, or for testing purposes)
 const getRefreshTokenFromRequest = (req) => req.cookies?.[authConfig.refreshToken.cookieName] || req.body?.refreshToken;
 
 const buildAuthData = ({ user, tokens, verificationSent }) => {
