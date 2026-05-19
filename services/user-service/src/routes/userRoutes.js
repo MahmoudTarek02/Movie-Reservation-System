@@ -35,4 +35,6 @@ router.use(restrictTo('admin'));
 
 router.get('/', userController.getAllUsers);
 
+// comment to check CI/CD pipeline runs on user-service when changes are made to this file
+
 module.exports = router;
