@@ -46,7 +46,16 @@ const restrictTo = (...roles) => (req, res, next) => {
   next();
 };
 
+const ensureVerified = (req, res, next) => {
+  if (!req.user?.isVerified) {
+    return next(new AppError('Please verify your email before accessing this resource.', 403));
+  }
+
+  next();
+};
+
 module.exports = {
   protect,
-  restrictTo
+  restrictTo,
+  ensureVerified
 };

@@ -3,7 +3,7 @@ const express = require('express');
 const authController = require('../controllers/authController');
 const oauthController = require('../controllers/oauthController');
 const userController = require('../controllers/userController');
-const { protect, restrictTo } = require('../middleware/authMiddleware');
+const { protect, restrictTo, ensureVerified } = require('../middleware/authMiddleware');
 const {
   authLimiter,
   oauthLimiter,
@@ -25,6 +25,7 @@ router.get('/auth/google', oauthLimiter, oauthController.redirectToGoogle);
 router.get('/auth/google/callback', oauthLimiter, oauthController.googleCallback);
 
 router.use(protect);
+router.use(ensureVerified);
 
 router.get('/me', userController.getMe);
 router.post('/sessions/revoke', userController.revokeSessions);

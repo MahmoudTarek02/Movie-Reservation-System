@@ -2,6 +2,7 @@ const PasswordResetToken = require('../models/passwordResetTokenModel');
 
 const create = (data) => PasswordResetToken.create(data);
 
+// delete active (not used and not expired) tokens for a user
 const deleteActiveForUser = (userId) => PasswordResetToken.deleteMany({
   user: userId,
   usedAt: { $exists: false },

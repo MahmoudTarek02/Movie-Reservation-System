@@ -52,9 +52,11 @@ const refreshToken = catchAsync(async (req, res) => {
   sendSuccess(res, 200, buildAuthData(result), 'Access token refreshed successfully');
 });
 
+// in this approach, access tokens can still work after logout until they expire
 const logout = catchAsync(async (req, res) => {
+  // revoke the refresh token in the database so it can't be used again
   await authService.logout(getRefreshTokenFromRequest(req), getRequestContext(req));
-
+  // clear the refresh token cookie on the client
   clearRefreshTokenCookie(res);
   sendSuccess(res, 200, {}, 'Logged out successfully');
 });
@@ -67,6 +69,12 @@ const forgotPassword = catchAsync(async (req, res) => {
     data.resetToken = result.resetToken;
   }
 
+  // it is intentional to always return the same response regardless of whether the email exists or not, 
+  // to prevent email enumeration attacks
+  // why the knowledge of whether an email exists or not is useful to attackers?
+  // - attackers can use it to identify valid accounts for further attacks (e.g. password guessing, phishing)
+  // privacy leakage 
+  
   sendSuccess(res, 200, data, 'If the email exists, a password reset link has been sent.');
 });
 

@@ -29,7 +29,7 @@ const refreshTokenSchema = new mongoose.Schema(
     createdByIp: String,
     userAgent: String,
     deviceId: String,
-    sessionId: {
+    sessionId: { // for multiple sessions per user, each for a different device or browser for example
       type: String,
       index: true
     },

@@ -236,12 +236,15 @@ const refreshAccessToken = async (refreshToken, context = {}) => {
   }
 
   const currentTokenHash = hashToken(refreshToken);
+  // find the token in the database and ensure it's valid (exists, not expired, not revoked)
   const storedToken = await refreshTokenRepository.findValidByHash(currentTokenHash);
 
   if (!storedToken) {
+    // check if the token exists but is revoked to detect refresh token reuse (possible token theft)
     const existingToken = await refreshTokenRepository.findByHash(currentTokenHash);
 
-    if (existingToken?.revokedAt && existingToken.user) {
+    // if the token was revoked and is being reused, revoke all tokens for that user as a precaution
+    if (existingToken?.revokedAt && existingToken.user) { 
       await refreshTokenRepository.revokeAllForUser(existingToken.user, {
         ip: context.ip,
         reason: 'refresh_token_reuse_detected'
@@ -259,6 +262,9 @@ const refreshAccessToken = async (refreshToken, context = {}) => {
     throw new AppError('Refresh token is invalid or expired', 401);
   }
 
+  // IF the token is valid, rotate it by creating a new token and revoking the old one. 
+  // this helps prevent token reuse and limits the window of opportunity for an attacker if a token is compromised
+
   const user = await userRepository.findActiveById(storedToken.user);
   if (!user) {
     await refreshTokenRepository.revokeById(storedToken._id, {
@@ -266,6 +272,14 @@ const refreshAccessToken = async (refreshToken, context = {}) => {
       reason: 'user_not_found'
     });
     throw new AppError('Refresh token is invalid', 401);
+  }
+
+  // VERY IMPORTANT
+  // user should verify their email before they can refresh access tokens, 
+  // otherwise attacker could create an account with someone else's email 
+  // and keep refreshing tokens without ever verifying the email
+  if (!user.isVerified) {
+    throw new AppError('Please verify your email before refreshing access tokens.', 403);
   }
 
   const newRefreshToken = await createRefreshToken(user, context, {
@@ -321,17 +335,18 @@ const forgotPassword = async ({ email }, context = {}) => {
 
   const user = await userRepository.findActiveByEmail(email);
 
-  if (!user) {
+  if (!user || !user.isVerified) {
     await writeAuditLog({
       event: 'forgot_password',
       status: 'failure',
       ip: context.ip,
       userAgent: context.userAgent,
-      metadata: { email }
+      metadata: { email, reason: !user ? 'email_not_found' : 'email_not_verified' }
     });
     return { resetToken: undefined };
   }
-
+  
+  // delete active (not used and not expired) tokens for a user
   await passwordResetTokenRepository.deleteActiveForUser(user._id);
 
   const rawToken = generateSecureToken(32);
@@ -344,7 +359,8 @@ const forgotPassword = async ({ email }, context = {}) => {
     createdByIp: context.ip
   });
 
-  const resetUrl = `${authConfig.app.clientUrl}/reset-password/${rawToken}`;
+  // const resetUrl = `${authConfig.app.clientUrl}/reset-password/${rawToken}`;
+  const resetUrl = `${authConfig.app.serviceUrl}/api/v1/users/reset-password/${rawToken}`;
 
   await sendEmail({
     email: user.email,

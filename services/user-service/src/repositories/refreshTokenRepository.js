@@ -44,6 +44,8 @@ const revokeByHash = (tokenHash, { ip, reason } = {}) => RefreshToken.findOneAnd
   { new: true }
 );
 
+// revoke all valid (not revoked, not expired) refresh tokens for a user 
+// used when a token reuse is detected or when the user manually revokes all sessions
 const revokeAllForUser = (userId, { ip, reason } = {}) => RefreshToken.updateMany(
   {
     user: userId,
