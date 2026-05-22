@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: movie-reservation-frontend
+    ports:
+      - '5173:5173'
+    environment:
+      - VITE_API_BASE_URL=/api
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:5173', res=>process.exit(res.statusCode===200?0:1)).on('error', ()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: movie-reservation-api-gateway
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./api-gateway/.env
+    environment:
+      - USER_SERVICE_URL=http://user-service:3001
+      - MOVIE_SERVICE_URL=http://movie-service:3002
+      - BOOKING_SERVICE_URL=http://reservation-service:3003
+    volumes:
+      - ./api-gateway:/app:cached
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    depends_on:
+      - user-service
+      - movie-service
+      - reservation-service
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/health', res=>process.exit(res.statusCode===200?0:1)).on('error', ()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: movie-reservation-user-service
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./services/user-service/config.env
+    volumes:
+      - ./services/user-service:/app:cached
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001/health', res=>process.exit(res.statusCode===200?0:1)).on('error', ()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  movie-service:
+    build:
+      context: ./services/movie-service
+      dockerfile: Dockerfile
+    container_name: movie-reservation-movie-service
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./services/movie-service:/app:cached
+      - /app/node_modules
+    command: sh -c "while true; do sleep 3600; done"
+    restart: unless-stopped
+
+  reservation-service:
+    build:
+      context: ./services/reservation-service
+      dockerfile: Dockerfile
+    container_name: movie-reservation-reservation-service
+    ports:
+      - '3003:3003'
+    volumes:
+      - ./services/reservation-service:/app:cached
+      - /app/node_modules
+    command: sh -c "while true; do sleep 3600; done"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: movie_reservation_network
