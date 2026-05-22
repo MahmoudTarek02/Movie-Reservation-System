@@ -7,8 +7,7 @@ module.exports = (app) => {
       serviceConfig.route,
       createServiceProxy({
         serviceName,
-        target: serviceConfig.target,
-        targetBasePath: serviceConfig.targetBasePath
+        target: serviceConfig.target
       })
     );
   });
