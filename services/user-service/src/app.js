@@ -4,6 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const cors = require('cors');
 
 // This middleware removes dangerous Mongo operators like $gt.
 const mongoSanitize = require('express-mongo-sanitize');
@@ -50,6 +51,11 @@ const limiter = rateLimit({
 
 // Apply rate limiting to all /api routes. We can exclude non-API routes like /health if needed.
 app.use('/api', limiter);
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 // Body parser
 app.use(express.json({ limit: '10kb' }));

@@ -1,0 +1,37 @@
+.movie-card {
+  background: #ffffff;
+  border: 1px solid #dfe4ea;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  min-height: 8rem;
+  overflow: hidden;
+}
+
+.movie-card__poster {
+  align-items: center;
+  background: #18324a;
+  color: #f6c85f;
+  display: flex;
+  font-size: 2rem;
+  font-weight: 800;
+  justify-content: center;
+}
+
+.movie-card__body {
+  padding: 1rem;
+}
+
+.movie-card h3 {
+  margin: 0 0 0.45rem;
+}
+
+.movie-card p {
+  color: #536070;
+  margin: 0 0 0.8rem;
+}
+
+.movie-card a {
+  color: #2b6cb0;
+  font-weight: 700;
+}

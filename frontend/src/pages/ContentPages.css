@@ -1,0 +1,48 @@
+.page {
+  margin: 0 auto;
+  max-width: 68rem;
+  padding: 2rem clamp(1rem, 4vw, 3rem);
+}
+
+.page--center {
+  display: grid;
+  min-height: calc(100vh - 4.5rem);
+  place-items: center;
+}
+
+.page__header {
+  margin-bottom: 1.5rem;
+}
+
+.page__header h1 {
+  margin: 0 0 0.4rem;
+}
+
+.page__header p,
+.content-panel p {
+  color: #536070;
+  margin-top: 0;
+}
+
+.movie-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.content-panel {
+  background: #ffffff;
+  border: 1px solid #dfe4ea;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.content-panel h1,
+.content-panel h2 {
+  margin-top: 0;
+}
+
+.content-panel a {
+  color: #2b6cb0;
+  font-weight: 700;
+}
