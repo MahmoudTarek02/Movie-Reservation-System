@@ -52,6 +52,7 @@ const limiter = rateLimit({
 // Apply rate limiting to all /api routes. We can exclude non-API routes like /health if needed.
 app.use('/api', limiter);
 
+// cors means cross origin resource sharing. it allows the frontend to make requests to the backend
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
