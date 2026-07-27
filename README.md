@@ -113,6 +113,17 @@ The User Service includes an integration test suite powered by Jest and Supertes
     npm run test:coverage
     ```
 
+### Test Coverage Details
+The test suite in [auth.test.js](file:///services/user-service/tests/auth.test.js) tests the following scenarios database-free (using repository mocking):
+-   **User Registration (`POST /register`)**:
+    -   *Success*: Registers new user profile, generates email verification tokens, triggers Nodemailer dispatch, and issues JWT access/refresh tokens.
+    -   *Failure*: Blocks sign-ups with duplicate emails or short passwords (less than 8 characters).
+-   **User Login (`POST /login`)**:
+    -   *Success*: Matches credentials against hashed password and returns access/refresh token pairs.
+    -   *Failure*: Rejects login with invalid emails, incorrect passwords, or locked account statuses.
+-   **User Logout (`POST /logout`)**:
+    -   *Success*: Revokes refresh tokens in the database and cleans client cookie headers.
+
 ### Continuous Integration (CI)
 A GitHub Actions workflow is configured in [.github/workflows/user-service-ci.yml](file:///.github/workflows/user-service-ci.yml). For every push or pull request targeting the `main` branch that modifies files in the `services/user-service/` directory, GitHub automatically runs the test suite on a virtual machine to ensure code reliability.
 
