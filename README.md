@@ -95,6 +95,29 @@ GOOGLE_CALLBACK_URL=http://localhost:3001/api/v1/users/auth/google/callback
 
 ---
 
+## Testing & CI/CD
+
+### Running Tests
+The User Service includes an integration test suite powered by Jest and Supertest.
+*   **Run tests manually**:
+    ```bash
+    cd services/user-service
+    npm test
+    ```
+*   **Run a specific test file**:
+    ```bash
+    npm test -- tests/auth.test.js
+    ```
+*   **Run tests with coverage**:
+    ```bash
+    npm run test:coverage
+    ```
+
+### Continuous Integration (CI)
+A GitHub Actions workflow is configured in [.github/workflows/user-service-ci.yml](file:///.github/workflows/user-service-ci.yml). For every push or pull request targeting the `main` branch that modifies files in the `services/user-service/` directory, GitHub automatically runs the test suite on a virtual machine to ensure code reliability.
+
+---
+
 ## Project Structure
 
 ```
